@@ -1,0 +1,6 @@
+<odoo>
+    <menuitem id="menu_cartera_root" name="Cartera" sequence="20" groups="account.group_account_invoice"/>
+    <menuitem id="menu_customer_effects" name="Efectos de Clientes" parent="menu_cartera_root" action="action_customer_effects" sequence="10"/>
+    <menuitem id="menu_supplier_effects" name="Efectos de Proveedores" parent="menu_cartera_root" action="action_supplier_effects" sequence="20"/>
+    <menuitem id="menu_remittances" name="Remesas" parent="menu_cartera_root" action="action_effect_remittances" sequence="30"/>
+</odoo>

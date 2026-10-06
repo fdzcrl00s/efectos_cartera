@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_effect_user,account.effect user,model_account_effect,account.group_account_invoice,1,1,1,1
+access_account_effect_remittance_user,account.effect.remittance user,model_account_effect_remittance,account.group_account_invoice,1,1,1,1
