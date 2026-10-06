@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <menuitem id="menu_effects_root" name="Cartera" parent="account.menu_finance" sequence="65"/>
-    <menuitem id="menu_effects_customer" name="Efectos de clientes" parent="menu_effects_root"
-              action="action_account_effect_customer" sequence="10"/>
-    <menuitem id="menu_effects_supplier" name="Efectos de proveedores" parent="menu_effects_root"
-              action="action_account_effect_supplier" sequence="20"/>
-</odoo>
