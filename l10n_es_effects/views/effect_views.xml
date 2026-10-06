@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_list" model="ir.ui.view">
+        <field name="name">account.effect.list</field>
+        <field name="model">account.effect</field>
+        <field name="arch" type="xml">
+            <list string="Efectos" create="true" default_order="due_date desc, id desc"
+                  decoration-danger="state == 'pending'" decoration-info="state == 'paid'">
+                <header>
+                    <button name="action_group_selected" type="object" string="Agrupar" class="btn-primary"/>
+                    <button name="action_create_remittance_selected" type="object" string="Crear remesa" class="btn-primary"/>
+                </header>
+                <field name="name" string="Nº Efecto"/>
+                <field name="reference" string="Referencia"/>
+                <field name="due_date" string="Vencimiento"/>
+                <field name="invoice_name" string="Nombre"/>
+                <field name="partner_id" string="Cliente"/>
+                <field name="effect_type" string="Tipo de Efecto"/>
+                <field name="payment_state" string="Estado del pago"/>
+                <field name="state" string="Situación"/>
+                <field name="amount" string="Total"/>
+                <field name="amount_pending" string="Total pendiente"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_account_effect_form" model="ir.ui.view">
+        <field name="name">account.effect.form</field>
+        <field name="model">account.effect</field>
+        <field name="arch" type="xml">
+            <form string="Efecto">
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="partner_id"/>
+                            <field name="company_type" readonly="1"/>
+                            <field name="reference"/>
+                            <field name="move_id" readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="due_date"/>
+                            <field name="effect_type" readonly="1"/>
+                            <field name="amount"/>
+                            <field name="amount_pending" readonly="1"/>
+                            <field name="currency_id"/>
+                            <field name="payment_state" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Contabilidad">
+                            <group>
+                                <field name="move_line_id" readonly="1"/>
+                                <field name="payment_id" readonly="1"/>
+                                <field name="payment_move_id" readonly="1"/>
+                                <field name="bank_journal_id"/>
+                            </group>
+                        </page>
+                        <page string="Agrupación y remesa">
+                            <group>
+                                <field name="group_id" readonly="1"/>
+                                <field name="remittance_id" readonly="1"/>
+                            </group>
+                        </page>
+                        <page string="Notas">
+                            <field name="notes"/>
+                        </page>
+                    </notebook>
+                    <group string="Situación">
+                        <field name="state" widget="statusbar" statusbar_visible="pending,grouped,remitted,paid,returned,uncollectible" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_register_payment" type="object" string="Saldar" class="btn-primary"
+                            invisible="state in ('paid', 'returned', 'uncollectible') or not move_line_id"/>
+                    <button name="action_mark_returned" type="object" string="Marcar devuelto"
+                            invisible="state in ('paid', 'returned', 'uncollectible')"/>
+                    <button name="action_mark_uncollectible" type="object" string="Marcar incobrable"
+                            invisible="state in ('paid', 'returned', 'uncollectible')"/>
+                    <button string="Cerrar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_account_effect_search" model="ir.ui.view">
+        <field name="name">account.effect.search</field>
+        <field name="model">account.effect</field>
+        <field name="arch" type="xml">
+            <search string="Buscar efectos">
+                <field name="name"/><field name="partner_id"/><field name="reference"/><field name="due_date"/>
+                <field name="state"/><field name="company_type"/>
+                <filter name="pending" string="Pendientes" domain="[('state', '=', 'pending')]"/>
+                <filter name="grouped" string="Agrupados" domain="[('state', '=', 'grouped')]"/>
+                <filter name="remitted" string="Remesados" domain="[('state', '=', 'remitted')]"/>
+                <filter name="paid" string="Saldados" domain="[('state', '=', 'paid')]"/>
+                <filter name="returned" string="Devueltos" domain="[('state', '=', 'returned')]"/>
+                <filter name="uncollectible" string="Incobrables" domain="[('state', '=', 'uncollectible')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_account_effect_customer" model="ir.actions.act_window">
+        <field name="name">Efectos de clientes</field>
+        <field name="res_model">account.effect</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_account_effect_list"/>
+        <field name="domain">[('company_type', '=', 'customer')]</field>
+        <field name="context">{'default_company_type': 'customer'}</field>
+    </record>
+
+    <record id="action_account_effect_supplier" model="ir.actions.act_window">
+        <field name="name">Efectos de proveedores</field>
+        <field name="res_model">account.effect</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_account_effect_list"/>
+        <field name="domain">[('company_type', '=', 'supplier')]</field>
+        <field name="context">{'default_company_type': 'supplier'}</field>
+    </record>
+</odoo>
