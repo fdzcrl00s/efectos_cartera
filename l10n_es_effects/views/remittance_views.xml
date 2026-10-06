@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_remittance_list" model="ir.ui.view">
+        <field name="name">account.effect.remittance.list</field>
+        <field name="model">account.effect.remittance</field>
+        <field name="arch" type="xml">
+            <list string="Remesas">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="company_type"/>
+                <field name="effect_count"/>
+                <field name="amount_total" sum="Total"/>
+                <field name="state"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_account_effect_remittance_form" model="ir.ui.view">
+        <field name="name">account.effect.remittance.form</field>
+        <field name="model">account.effect.remittance</field>
+        <field name="arch" type="xml">
+            <form string="Remesa">
+                <header>
+                    <button name="action_mark_sent" type="object" string="Confirmar remesa" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_register_payments" type="object" string="Liquidar remesa" class="btn-primary" invisible="state not in ('sent','draft')"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,paid,cancelled"/>
+                </header>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="date"/>
+                            <field name="company_type"/>
+                        </group>
+                        <group>
+                            <field name="effect_count" readonly="1"/>
+                            <field name="amount_total" readonly="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Agrupaciones">
+                            <field name="group_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="date"/>
+                                    <field name="partner_id"/>
+                                    <field name="amount_total"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Efectos">
+                            <field name="effect_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="move_id"/>
+                                    <field name="partner_id"/>
+                                    <field name="due_date"/>
+                                    <field name="amount"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                    <field name="notes"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_account_effect_remittance_search" model="ir.ui.view">
+        <field name="name">account.effect.remittance.search</field>
+        <field name="model">account.effect.remittance</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <filter name="draft" string="Borrador" domain="[('state','=','draft')]"/>
+                <filter name="sent" string="Remesadas" domain="[('state','=','sent')]"/>
+                <filter name="paid" string="Saldadas" domain="[('state','=','paid')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_effect_remittances" model="ir.actions.act_window">
+        <field name="name">Remesas</field>
+        <field name="res_model">account.effect.remittance</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>
