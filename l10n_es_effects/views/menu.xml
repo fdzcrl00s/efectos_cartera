@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <menuitem id="menu_effects_root"
+              name="Cartera de efectos"
+              parent="account.menu_finance"
+              sequence="65"/>
+    <menuitem id="menu_effects"
+              name="Efectos"
+              parent="menu_effects_root"
+              action="action_account_effect"
+              sequence="10"/>
+    <menuitem id="menu_effects_groups"
+              name="Agrupaciones"
+              parent="menu_effects_root"
+              action="action_account_effect_group"
+              sequence="20"/>
+    <menuitem id="menu_effects_remittances"
+              name="Remesas"
+              parent="menu_effects_root"
+              action="action_account_effect_remittance"
+              sequence="30"/>
+</odoo>
