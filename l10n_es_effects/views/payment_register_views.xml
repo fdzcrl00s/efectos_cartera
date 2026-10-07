@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_payment_register_effect_form" model="ir.ui.view">
+        <field name="name">account.payment.register.effect.form</field>
+        <field name="model">account.payment.register</field>
+        <field name="inherit_id" ref="account.view_account_payment_register_form"/>
+        <field name="arch" type="xml">
+            <!-- In cartera mode we replace the native payment layout with a dedicated layout. -->
+            <xpath expr="//group[@name='group1']" position="attributes">
+                <attribute name="invisible">cartera_mode</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group2']" position="attributes">
+                <attribute name="invisible">cartera_mode</attribute>
+            </xpath>
+            <xpath expr="//label[@for='amount']" position="attributes">
+                <attribute name="invisible">cartera_mode</attribute>
+            </xpath>
+            <xpath expr="//div[@name='amount_div']" position="attributes">
+                <attribute name="invisible">cartera_mode</attribute>
+            </xpath>
+            <xpath expr="//group[@name='group2']" position="after">
+                <separator string="Datos de pago" invisible="not cartera_mode"/>
+                <group invisible="not cartera_mode" col="1" colspan="4" class="w-100">
+                    <field name="journal_id"/>
+                    <field name="payment_method_line_id"/>
+                    <field name="amount" readonly="cartera_mode and not cartera_amount_editable"/>
+                    <field name="payment_date"/>
+                    <field name="communication" string="Circular / Concepto"/>
+                </group>
+                <separator string="Liquidación del efecto" invisible="not cartera_mode"/>
+                <group invisible="not cartera_mode" col="1" colspan="4" class="w-100">
+                    <field name="total_effect" string="Total efecto" readonly="1"/>
+                    <field name="effect_balance"/>
+                    <field name="effect_expenses"/>
+                    <field name="expense_account_id"/>
+                    <field name="effect_commissions"/>
+                    <field name="commission_account_id"/>
+                    <field name="group_bank_entries"/>
+                </group>
+            </xpath>
+        </field>
+    </record>
+</odoo>
