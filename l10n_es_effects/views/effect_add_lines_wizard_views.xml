@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_add_lines_wizard" model="ir.ui.view">
+        <field name="name">account.effect.add.lines.wizard.form</field>
+        <field name="model">account.effect.add.lines.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Añadir efectos">
+                <group>
+                    <field name="container_type" invisible="1"/>
+                    <field name="company_id" invisible="1"/>
+                    <field name="group_id" invisible="1"/>
+                    <field name="remittance_id" invisible="1"/>
+                    <field name="group_ids" invisible="container_type != 'remittance'"
+                           domain="[('state', '=', 'draft'), ('company_id', '=', company_id)]"
+                           widget="many2many_tags"/>
+                    <field name="effect_ids"
+                           domain="[('state', 'in', ['pending', 'grouped']), ('company_id', '=', company_id)]"
+                           widget="many2many_tags"/>
+                </group>
+                <footer>
+                    <button name="action_add" type="object" string="Añadir seleccionados" class="btn-primary"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
