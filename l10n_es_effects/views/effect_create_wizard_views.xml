@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_create_wizard" model="ir.ui.view">
+        <field name="name">account.effect.create.wizard.form</field>
+        <field name="model">account.effect.create.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Crear elemento de cartera">
+                <group>
+                    <field name="effect_type" widget="radio" options="{'horizontal': true}"/>
+                </group>
+                <separator string="Datos generales"/>
+                <group>
+                    <group>
+                        <field name="company_type"/>
+                        <field name="partner_id" string="Cliente / Proveedor" invisible="effect_type == 'remittance'"/>
+                        <field name="company_id" readonly="1" invisible="effect_type != 'remittance'"/>
+                        <field name="currency_id" invisible="effect_type == 'effect'"/>
+                        <field name="payment_direction" readonly="1" invisible="effect_type == 'remittance'"/>
+                    </group>
+                    <group>
+                        <field name="due_date"/>
+                        <field name="amount" invisible="effect_type != 'effect'"/>
+                        <field name="move_id" invisible="effect_type != 'effect'"/>
+                        <field name="bank_journal_id"/>
+                        <field name="partner_bank_id"/>
+                    </group>
+                </group>
+                <group>
+                    <field name="reference"/>
+                    <field name="notes" invisible="effect_type == 'effect'"/>
+                </group>
+                <div class="alert alert-info" invisible="effect_type == 'effect'">
+                    El Nº Cartera se asignará automáticamente al confirmar la creación. Después podrás añadir los efectos desde el formulario.
+                </div>
+                <footer>
+                    <button name="action_create" type="object" string="Crear" class="btn-primary"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>
