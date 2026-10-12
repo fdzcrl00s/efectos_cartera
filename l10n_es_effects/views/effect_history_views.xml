@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_payment_history_list" model="ir.ui.view">
+        <field name="name">account.effect.payment.history.list</field><field name="model">account.effect.payment.history</field>
+        <field name="arch" type="xml"><list string="Histórico Pagos"><field name="date"/><field name="payment_id"/><field name="journal_id"/><field name="amount"/><field name="note"/><field name="effect_id"/></list></field>
+    </record>
+    <record id="view_account_effect_situation_history_list" model="ir.ui.view">
+        <field name="name">account.effect.situation.history.list</field><field name="model">account.effect.situation.history</field>
+        <field name="arch" type="xml"><list string="Histórico Situaciones"><field name="date"/><field name="state"/><field name="note"/><field name="effect_id"/></list></field>
+    </record>
+</odoo>
