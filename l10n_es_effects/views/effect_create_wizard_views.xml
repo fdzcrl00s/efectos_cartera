@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_create_wizard" model="ir.ui.view">
+        <field name="name">account.effect.create.wizard.form</field>
+        <field name="model">account.effect.create.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Crear elemento de cartera">
+                <group>
+                    <field name="company_partner_id" invisible="1"/>
+                    <field name="effect_type" widget="radio" options="{'horizontal': true}"/>
+                    <field name="company_id" string="Empresa" readonly="1" invisible="effect_type != 'remittance'"/>
+                </group>
+                <notebook>
+                    <page string="Efecto" invisible="effect_type != 'effect'">
+                        <group>
+                            <group>
+                                <field name="company_type"/>
+                                <field name="partner_id" string="Empresa"/>
+                                <field name="currency_id"/>
+                                <field name="payment_direction" readonly="1"/>
+                                <field name="move_id" domain="[('company_id', '=', company_id), ('state', '=', 'posted'), ('move_type', 'in', ('out_invoice', 'in_invoice'))]"/>
+                                <field name="manual_account_id" string="Cuenta destino" invisible="move_id"
+                                       required="not move_id and not source_move_line_id"
+                                       domain="[('company_ids', 'in', company_id), ('deprecated', '=', False), ('reconcile', '=', True)]"/>
+                                <field name="source_move_line_id" string="Apunte contable existente (opcional)" invisible="move_id"
+                                       domain="[('company_id', '=', company_id), ('move_id.state', '=', 'posted'), ('reconciled', '=', False), ('account_id.reconcile', '=', True), ('account_id.deprecated', '=', False)]"/>
+                            </group>
+                            <group>
+                                <field name="due_date"/>
+                                <field name="amount" readonly="move_id or source_move_line_id"/>
+                                <field name="bank_journal_id"/>
+                                <field name="partner_bank_id" domain="[('partner_id', '=', partner_id)]"/>
+                                <field name="reference" string="Circular / Concepto"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-info" invisible="move_id">
+                            Puedes crear el efecto sin apunte de origen: indica una cuenta destino conciliable, el importe y el vencimiento. Guardarlo no genera asientos; la contabilización se realizará cuando se agrupe o se salde.
+                        </div>
+                    </page>
+                    <page string="Agrupación" invisible="effect_type != 'group'">
+                        <group>
+                            <group>
+                                <field name="company_type"/>
+                                <field name="currency_id"/>
+                            </group>
+                            <group>
+                                <field name="due_date"/>
+                                <field name="bank_journal_id"/>
+                                <field name="reference" string="Circular / Concepto"/>
+                                <field name="notes"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-info">
+                            Primero se crea la agrupación vacía. Después podrás añadir los efectos pendientes desde su formulario.
+                        </div>
+                    </page>
+                    <page string="Remesa" invisible="effect_type != 'remittance'">
+                        <group>
+                            <group>
+                                <field name="currency_id"/>
+                            </group>
+                            <group>
+                                <field name="due_date"/>
+                                <field name="bank_journal_id"/>
+                                <field name="partner_bank_id" string="Cuenta bancaria" domain="[('partner_id', '=', company_partner_id)]"/>
+                                <field name="reference" string="Circular / Concepto"/>
+                                <field name="notes"/>
+                            </group>
+                        </group>
+                        <div class="alert alert-info">
+                            La remesa pertenece a la empresa activa y no necesita un cliente, proveedor ni cuenta contable propia. Después podrás añadir los efectos pendientes.
+                        </div>
+                    </page>
+                </notebook>
+                <footer>
+                    <button name="action_create" type="object" string="Crear" class="btn-primary"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+</odoo>

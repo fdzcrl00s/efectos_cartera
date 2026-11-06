@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_list" model="ir.ui.view">
+        <field name="name">account.effect.list</field>
+        <field name="model">account.effect</field>
+        <field name="arch" type="xml">
+            <list string="Efectos" create="false" default_order="due_date desc, id desc"
+                  decoration-danger="state == 'pending'"
+                  decoration-info="state != 'pending'">
+                <header>
+                    <button name="action_create_from_menu" type="object" string="Crear" class="btn-primary" display="always" invisible="context.get('remittance_id') or context.get('group_id')"/>
+                    <button name="action_group_selected" type="object" string="Agrupar" invisible="context.get('remittance_id') or context.get('group_id')"/>
+                    <button name="action_create_remittance_selected" type="object" string="Crear remesa" invisible="context.get('remittance_id') or context.get('group_id')"/>
+                    <button name="action_add_selected_to_remittance" type="object" string="Añadir seleccionados" class="btn-primary" invisible="not context.get('remittance_id')"/>
+                    <button name="action_add_selected_to_group" type="object" string="Añadir seleccionados" class="btn-primary" invisible="not context.get('group_id')"/>
+                </header>
+                <field name="is_container" column_invisible="True"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="name" string="Nº Efecto"/>
+                <field name="cartera_number" string="Nº Cartera"/>
+                <field name="display_reference" string="Referencia"/>
+                <field name="due_date" string="Vencimiento"/>
+                <field name="display_label" string="Nombre"/>
+                <field name="partner_id" string="Empresa"/>
+                <field name="effect_type" string="Tipo de Efecto"/>
+                <field name="display_payment_state" string="Estado del pago"/>
+                <field name="display_situation" string="Situación"/>
+                <field name="amount" string="Total" sum="Total"/>
+                <field name="amount_pending" string="Total pendiente" sum="Total pendiente"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_account_effect_form" model="ir.ui.view">
+        <field name="name">account.effect.form</field>
+        <field name="model">account.effect</field>
+        <field name="arch" type="xml">
+            <form string="Cartera">
+                <header>
+                    <button name="action_back_to_effect_list" type="object" string="Volver al listado" class="btn-secondary"/>
+                    <button name="action_saldar_entero" type="object" string="Saldar" class="btn-primary"
+                            invisible="not container_group_id or amount_pending == 0 or not has_initial_grouping_move"/>
+                    <button name="action_saldar_entero" type="object" string="Saldar (entero)" class="btn-primary"
+                            invisible="not container_remittance_id or amount_pending == 0 or not has_initial_grouping_move"/>
+                    <button name="action_saldar_parcial" type="object" string="Saldar parcialmente"
+                            invisible="not is_container or not container_remittance_id or amount_pending == 0 or not has_initial_grouping_move"/>
+                    <button name="action_saldar" type="object" string="Saldar" class="btn-primary"
+                            invisible="is_container or state in ('paid', 'returned', 'uncollectible') or (not move_line_id and not portfolio_chain_id and not partner_id and not manual_account_id)"/>
+                    <button name="action_anular_saldado" type="object" string="Anular último saldado"
+                            invisible="not payment_id and not has_container_payments and not has_manual_payments"/>
+                    <button name="action_devolver_efectos" type="object" string="Devolver efectos"
+                            invisible="not container_remittance_id or not has_returnable_effects"/>
+                    <button name="action_devolver" type="object" string="Devolver" invisible="state != 'paid' or is_container"/>
+                    <field name="container_status_state" widget="statusbar" statusbar_visible="pending,partial,paid" readonly="1"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_open_invoice" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="not move_id">
+                            <span class="o_stat_text">Factura</span>
+                        </button>
+                        <button name="action_open_payment" type="object" class="oe_stat_button" icon="fa-money" invisible="not payment_id">
+                            <span class="o_stat_text">Pago</span>
+                        </button>
+                        <button name="action_open_accounting_entries" type="object" class="oe_stat_button" icon="fa-book" invisible="not is_container and not has_accounting_entries">
+                            <span class="o_stat_text">Asientos</span>
+                        </button>
+                    </div>
+                    <h1><field name="display_label" readonly="1"/></h1>
+                    <field name="is_container" invisible="1"/>
+                    <field name="is_portfolio_effect" invisible="1"/>
+                    <field name="payment_id" invisible="1"/>
+                    <field name="move_id" invisible="1"/>
+                    <field name="container_group_id" invisible="1"/>
+                    <field name="container_remittance_id" invisible="1"/>
+                    <field name="container_editable" invisible="1"/>
+                    <field name="has_accounting_entries" invisible="1"/>
+                    <field name="has_container_payments" invisible="1"/>
+                    <field name="has_manual_payments" invisible="1"/>
+                    <field name="has_initial_grouping_move" invisible="1"/>
+                    <field name="has_returnable_effects" invisible="1"/>
+                    <group>
+                        <group>
+                            <field name="name" string="Nº Efecto" readonly="1"/>
+                            <field name="cartera_number" string="Nº Cartera" readonly="1"/>
+                            <field name="company_id" string="Empresa" readonly="1" invisible="effect_type != 'remittance'"/>
+                            <field name="effect_type" readonly="id or not context.get('cartera_new_mode')"/>
+                            <field name="company_type" string="Tipo de empresa" readonly="move_id or move_line_id or (not container_editable and not context.get('cartera_new_mode'))" invisible="manual_category == 'employee_tax'"/>
+                            <field name="manual_category" invisible="1"/>
+                            <field name="partner_id" string="Empresa" readonly="not container_editable" invisible="manual_category == 'employee_tax' or effect_type == 'remittance'" required="(effect_type == 'effect' and manual_category != 'employee_tax') or (container_group_id and amount &gt; 0)"/>
+                            <field name="manual_account_id" string="Cuenta destino"
+                                   invisible="move_id or is_container or is_portfolio_effect or effect_type != 'effect' or manual_category == 'employee_tax'"
+                                   readonly="not container_editable or move_line_id"
+                                   required="not move_id and not is_container and not is_portfolio_effect and effect_type == 'effect' and manual_category != 'employee_tax'"/>
+                            <div class="text-muted" invisible="move_id or is_container or is_portfolio_effect or effect_type != 'effect' or manual_category == 'employee_tax'">
+                                El efecto manual no genera ningún asiento al guardarlo. La cuenta se utilizará cuando se agrupe o se registre su saldado.
+                            </div>
+                            <field name="grouping_account_id" string="Cuenta destino"
+                                   invisible="not container_group_id" readonly="not container_editable" required="container_group_id and amount &gt; 0"/>
+                            <field name="bank_journal_id" string="Banco" readonly="not container_editable"/>
+                            <field name="partner_bank_id" string="Cuenta bancaria" domain="[('partner_id', '=', partner_id)]" readonly="not container_editable" invisible="effect_type == 'remittance'"/>
+                            <field name="payment_direction" readonly="1"/>
+                            <field name="amount" readonly="not container_editable or move_id or move_line_id or is_container or effect_type != 'effect'"/>
+                        </group>
+                        <group>
+                            <field name="due_date" string="Fecha de vencimiento" readonly="not container_editable"/>
+                            <field name="reference" string="Circular / Concepto" readonly="not container_editable"/>
+                            <field name="state" string="Situación" readonly="1"/>
+                            <field name="situation_ref" string="Pertenece a" widget="reference" readonly="1" invisible="not situation_ref"/>
+                            <field name="amount_pending" string="Total pendiente" readonly="1"/>
+                            <field name="invoice_reference" string="Factura" readonly="1" invisible="not invoice_reference or effect_type != 'effect'"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Efectos agrupados" invisible="effect_type == 'effect'">
+                            <field name="associated_effect_ids" nolabel="1">
+                                <list create="false" delete="false">
+                                    <field name="name" string="Nº Efecto"/>
+                                    <field name="due_date" string="Fecha de vencimiento"/>
+                                    <field name="reference" string="Circular / Concepto"/>
+                                    <field name="partner_id" string="Empresa"/>
+                                    <field name="amount" string="Total"/>
+                                    <field name="amount_pending" string="Total pendiente"/>
+                                    <field name="display_payment_state" string="Estado del pago"/>
+                                    <button name="action_anular_saldado" type="object" string="Anular saldado" class="btn-link" invisible="not has_container_payments or state != 'paid'"/>
+                                    <button name="action_ungroup_selected" type="object" string="Quitar" class="btn-link"
+                                            invisible="not parent.container_editable or state == 'paid'"/>
+                                </list>
+                            </field>
+                            <div class="o_row mt-2">
+                                <button name="action_ungroup_selected" type="object" string="Desagrupación Masiva"
+                                        invisible="not container_editable"/>
+                                <button name="action_add_pending_effects" type="object" string="Añadir efectos" class="btn-primary"
+                                        invisible="not container_editable"/>
+                            </div>
+                        </page>
+                        <page string="Efectos de la misma Cartera">
+                            <field name="portfolio_effect_ids" nolabel="1">
+                                <list create="false" delete="false">
+                                    <field name="name" string="Nº Efecto"/>
+                                    <field name="reference" string="Circular / Concepto"/>
+                                    <field name="due_date" string="Fecha"/>
+                                    <field name="amount" string="Total"/>
+                                    <field name="amount_pending" string="Total pendiente"/>
+                                    <field name="display_payment_state" string="Estado del pago"/>
+                                    <button name="action_anular_saldado" type="object" string="Anular saldado" class="btn-link"
+                                            invisible="state != 'paid' or not has_container_payments"/>
+                                    <button name="action_devolver" type="object" string="Devolver" class="btn-link"
+                                            invisible="state != 'paid' or not is_portfolio_effect"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Histórico de saldados" invisible="effect_type != 'effect'">
+                            <field name="payment_history_ids" nolabel="1">
+                                <list create="false" delete="false">
+                                    <field name="date"/>
+                                    <field name="move_id" string="Asiento"/>
+                                    <field name="reversal_move_id" string="Asiento de anulación"/>
+                                    <field name="journal_id"/>
+                                    <field name="amount"/>
+                                    <field name="is_reversed"/>
+                                    <field name="note"/>
+                                    <button name="action_anular_saldado" type="object" string="Anular" class="btn-link" invisible="operation_type != 'paid' or is_reversed or not move_id or move_id.state != 'posted'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Histórico Pagos">
+                            <field name="container_payment_history_ids" nolabel="1">
+                                <list create="false" delete="false">
+                                    <field name="id"/>
+                                    <field name="reference"/>
+                                    <field name="move_id" string="Asiento"/>
+                                    <field name="date"/>
+                                    <field name="effect_ids" string="Agrupar Efectos"/>
+                                    <field name="amount" string="Total"/>
+                                    <field name="type" string="Tipo"/>
+                                    <button name="action_anular_saldado" type="object" string="Anular saldado" class="btn-link"
+                                            invisible="type != 'paid' or not move_id or move_id.state != 'posted'"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Histórico Situaciones">
+                            <field name="situation_history_ids" nolabel="1">
+                                <list create="false" delete="false">
+                                    <field name="date"/>
+                                    <field name="state"/>
+                                    <field name="note"/>
+                                </list>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_account_effect_search" model="ir.ui.view">
+        <field name="name">account.effect.search</field>
+        <field name="model">account.effect</field>
+        <field name="arch" type="xml">
+            <search string="Buscar efectos">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="display_reference"/>
+                <field name="due_date"/>
+                <field name="state"/>
+                <field name="company_type"/>
+                <field name="effect_type"/>
+                <field name="manual_category"/>
+                <filter name="pending" string="Pendientes" domain="[('state', '=', 'pending')]"/>
+                <filter name="paid" string="Saldados" domain="[('state', '=', 'paid')]"/>
+                <filter name="group_due_date_month" string="Por mes" context="{'group_by': 'due_date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_account_effect_customer" model="ir.actions.act_window">
+        <field name="name">Efectos de clientes</field>
+        <field name="res_model">account.effect</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_account_effect_list"/>
+        <field name="domain">[('company_type', '=', 'customer')]</field>
+        <field name="context">{'default_company_type': 'customer', 'default_effect_type': 'effect'}</field>
+    </record>
+    <record id="action_account_effect_supplier" model="ir.actions.act_window">
+        <field name="name">Efectos de proveedores</field>
+        <field name="res_model">account.effect</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_account_effect_list"/>
+        <field name="domain">[('company_type', '=', 'supplier')]</field>
+        <field name="context">{'default_company_type': 'supplier', 'default_effect_type': 'effect'}</field>
+    </record>
+</odoo>
