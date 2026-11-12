@@ -3,7 +3,7 @@
 Módulo de gestión de efectos comerciales de clientes y proveedores integrado con la contabilidad de **Odoo 18.0**.
 
 - **Nombre técnico:** `l10n_es_effects`
-- **Versión del módulo:** `18.0.4.4.9`
+- **Versión del módulo:** `18.0.4.4.10`
 - **Licencia:** LGPL-3
 - **Dependencias declaradas:** `account`, `l10n_es`
 
