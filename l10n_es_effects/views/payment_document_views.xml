@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_payment_document_list" model="ir.ui.view">
+        <field name="name">account.effect.payment.document.list</field>
+        <field name="model">account.effect.payment.document</field>
+        <field name="arch" type="xml">
+            <list string="Documentos de pago">
+                <field name="code"/>
+                <field name="name"/>
+                <field name="requires_delivery"/>
+                <field name="remesable"/>
+            </list>
+        </field>
+    </record>
+    <record id="view_account_effect_payment_document_form" model="ir.ui.view">
+        <field name="name">account.effect.payment.document.form</field>
+        <field name="model">account.effect.payment.document</field>
+        <field name="arch" type="xml">
+            <form string="Documento de pago">
+                <sheet>
+                    <group>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="requires_delivery"/>
+                        <field name="remesable"/>
+                        <field name="active"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_account_effect_payment_document" model="ir.actions.act_window">
+        <field name="name">Documentos de pago</field>
+        <field name="res_model">account.effect.payment.document</field>
+        <field name="view_mode">list,form</field>
+        <field name="view_id" ref="view_account_effect_payment_document_list"/>
+    </record>
+</odoo>
