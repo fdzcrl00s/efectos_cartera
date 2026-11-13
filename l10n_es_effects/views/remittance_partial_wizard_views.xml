@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_account_effect_remittance_partial_wizard" model="ir.ui.view">
+        <field name="name">account.effect.remittance.partial.wizard.form</field>
+        <field name="model">account.effect.remittance.partial.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Saldado parcial">
+                <sheet>
+                    <group>
+                        <field name="remittance_id" invisible="not remittance_id"/>
+                        <field name="group_id" invisible="not group_id"/>
+                        <field name="selected_total" readonly="1"/>
+                    </group>
+                    <field name="line_ids" nolabel="1">
+                        <list create="false" delete="false">
+                            <field name="effect_id" column_invisible="True" force_save="1"/>
+                            <field name="selected" string="Saldar" widget="boolean_toggle" force_save="1"/>
+                            <field name="name" string="Nº Efecto"/>
+                            <field name="reference" string="Concepto"/>
+                            <field name="due_date" string="Vencimiento"/>
+                            <field name="partner_id" string="Empresa"/>
+                            <field name="amount" string="Total"/>
+                            <field name="settlement_amount" string="Importe a saldar"/>
+                            <field name="payment_state" string="Estado del pago"/>
+                        </list>
+                    </field>
+                </sheet>
+                <footer>
+                    <button name="action_saldar" type="object" string="Saldar seleccionados" class="btn-primary"/>
+                    <button string="Cancelar" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="view_account_effect_remittance_return_wizard" model="ir.ui.view">
+        <field name="name">account.effect.remittance.return.wizard.form</field>
+        <field name="model">account.effect.remittance.return.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Devolver efectos">
+                <sheet>
+                    <separator string="DATOS DE PAGO"/>
+                    <group col="2">
+                        <field name="remittance_id" invisible="1"/>
+                        <field name="company_id" invisible="1"/>
+                        <field name="currency_id" invisible="1"/>
+                        <field name="journal_id" string="Diario"/>
+                        <field name="available_payment_document_ids" invisible="1"/>
+                        <field name="payment_document_id" string="Documento de pago" domain="[('id', 'in', available_payment_document_ids)]" required="1"/>
+                        <field name="payment_date" string="Fecha de pago"/>
+                        <field name="communication" string="Circular / Concepto" colspan="2"/>
+                    </group>
+                    <separator string="LIQUIDACIÓN DEL EFECTO"/>
+                    <group col="2">
+                        <field name="total_effect" string="Total efecto" readonly="1"/>
+                        <field name="effect_balance" string="Cuadre del efecto"/>
+                        <field name="effect_expenses" string="Gastos"/>
+                        <field name="expense_account_id" string="Cuenta de gastos"/>
+                        <field name="effect_commissions" string="Comisiones"/>
+                        <field name="commission_account_id" string="Cuenta de comisiones"/>
+                        <field name="group_bank_entries" string="Agrupar apuntes en banco"/>
+                    </group>
+                    <separator string="OPCIONES DE DEVOLUCIÓN"/>
+                    <group col="2">
+                        <field name="impute_expenses" string="Imputar gastos"/>
+                        <field name="create_new_effect" string="Crear nuevo efecto"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="action_devolver" type="object" string="Crear devolución" class="btn-primary"/>
+                    <button string="Descartar" special="cancel" class="btn-secondary"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
