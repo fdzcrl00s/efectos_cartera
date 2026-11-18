@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_move_form_effects" model="ir.ui.view">
+        <field name="name">account.move.form.effects</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_open_effects"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-money"
+                        invisible="move_type not in ('out_invoice', 'in_invoice', 'out_refund', 'in_refund')">
+                    <field name="effect_count" widget="statinfo" string="Efectos"/>
+                </button>
+            </xpath>
+        </field>
+    </record>
+
+    <!-- Keep the legacy view record defined but inactive. This both disables the old
+         header button on upgrade and remains installable on a fresh database. -->
+    <record id="view_invoice_tree_generate_effects" model="ir.ui.view">
+        <field name="name">account.move.invoice.list.generate.effects.legacy</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//list/header" position="inside">
+                <button name="action_generate_effects_from_existing_invoices"
+                        type="object"
+                        string="Generar efectos de cartera"
+                        class="btn-primary"
+                        groups="account.group_account_user"
+                        confirm="Se generarán los efectos pendientes de todas las facturas seleccionadas. Si alguna no puede procesarse, se cancelará toda la operación. ¿Deseas continuar?"/>
+            </xpath>
+        </field>
+        <field name="active" eval="False"/>
+    </record>
+
+    <!-- Mass import is exposed in the standard Action menu of the invoice list. -->
+    <record id="action_server_generate_effects_from_invoices" model="ir.actions.server">
+        <field name="name">Generar efectos de cartera</field>
+        <field name="model_id" ref="account.model_account_move"/>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">action</field>
+        <field name="binding_view_types">list</field>
+        <field name="groups_id" eval="[(4, ref('account.group_account_user'))]"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_generate_effects_from_existing_invoices()</field>
+    </record>
+
+    <!-- Show the returned state explicitly in the invoice list. -->
+    <record id="view_invoice_tree_returned_status" model="ir.ui.view">
+        <field name="name">account.move.invoice.list.returned.status</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_invoice_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='status_in_payment']" position="attributes">
+                <attribute name="decoration-danger">payment_state == 'returned' or (payment_state == 'not_paid' and invoice_date_due &lt; context_today().strftime('%Y-%m-%d'))</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
